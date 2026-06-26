@@ -1,0 +1,24 @@
+pwd : показать текущую рабочую директорию.
+ls : вывести список файлов и папок.
+ls -l : вывести список файлов в виде подробного списка.
+whoami : показать имя текущего пользователя.
+hostname : показать имя хоста.
+mkdir Lab3 : создать папку "Lab3".
+cd Lab3 : перейти в папку "Lab3".
+cd - : вернуться в предыдущую рабочую директорию.
+mkdir -p projects/project1/data projects/project2 documents/reports documents/notes scripts results : создание разветвленной структуры вложенных папок одной командой.
+ls -R : рекурсивный вывод содержимого всех папок и подпапок.
+cd ~/Lab3/documents/ : перейти в конкретную папку.
+touch file1.txt file2.txt file3.txt : создать пустые текстовые файлы.
+ls -la : показать все файлы, включая скрытые, в виде подробного списка.
+printf 'first string$\nsecond string\nthird$ string\n' > file1.txt : записать текст в файл.
+printf 'fourth string$\nfifth$ string\n' >> file1.txt : добавить текст в конец файла.
+cat file1.txt : вывести содержимое файла на экран.
+cat file1.txt > file_content.txt : скопировать содержимое одного файла в другой через перенаправление.
+mv file3.txt ~/Lab3/results/ : переместить файл в другую папку.
+ls ~/Lab3/results/file3.txt : проверить наличие файла по указанному пути.
+ls ~/Lab3/documents/file1.txt file2.txt file_content.txt notes reports : просмотр списка конкретных объектов в папке.
+printf 'str1$\nstr2\nstr3\nstr4\nstr5\nstr6\nstr7\nstr8\nstr9\nstr10\$n' > data.txt : создание файла с десятью строками.
+head -n 3 data.txt > first_three_lines.txt : записать первые 3 строки файла в новый файл.
+tail -n 3 data.txt > last_three_lines.txt : записать последние 3 строки файла в новый файл.
+wc -l data.txt : подсчитать количество строк в файле.
