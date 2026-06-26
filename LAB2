@@ -1,0 +1,142 @@
+#1
+Get-process
+Get-process -Name "wininit"
+Get-process | Sort-Object CPU -Descending
+Get-process | Sort-Object WorkingSet -Descending
+Get-process -Id 2576 | Select-Object (explorer)
+#2
+start notepad
+tasklist | findstr notepad
+taskkill /IM notepad.exe
+
+start notepad
+taskkill /F /IM notepad.exe
+#3
+(Get-process -Id 2576).Threads.Count
+Get-process -Id 2576 | Select-Object -ExpandProperty Threds | Select-Object Id, PriorityLevel, ThreadState
+Процесс представляет собой изолированную среду выполнения программы, а потоки — это отдельные единицы исполнения внутри этого процесса. Минимальное количество потоков в процессе — один, но их может быть несколько для реализации многозадачности.
+
+Отличия потока от процесса заключаются в следующем: процесс — это запущенное приложение с собственным изолированным адресным пространством, и процессы не могут напрямую обращаться к памяти друг друга. Поток же — это единица планирования внутри процесса; один процесс может содержать несколько потоков, выполняющихся параллельно и разделяющих общую память.
+
+Разделяемые ресурсы: поскольку потоки существуют в рамках одного процесса, они имеют общий доступ к виртуальному адресному пространству (памяти), глобальным переменным, дескрипторам открытых файлов и каналов связи, а также к сегменту кода самой программы.
+#4
+$Password - Read-Host -AsSecureString
+New-localUser -Name "NewUser" -Password $Password -Description "новый пользователь"
+Get-LocalUser -Name "NewUser"
+#5 Add-LocalgroupMember -Group "Администраторы" -Member "Admin"
+Add-LocalGroupMember -Group "Пользователи" -Member "Admin" 
+Get-LocalgroupMember -Group "Администраторы" 
+Set-LocalUser -Name "Admin" -Description "new_admin"
+#6
+Disable-LocalUser -Name "NewUser"
+Enable-LocalUser -Name "NewUser"
+Remove-LocalUser -Name "NewUser"
+#7
+New-Item -Path "C:\LabWork\Project01\Documentation" -ItemType Directory -Force
+tree C:\LabWork /f
+#8
+New-Item -Path "C:\Labwork\test.txt" -ItemType File
+Set-Content -Path "C:\Labwork\test.txt" -Value "Text"
+Copy-Item -Path "C:\Labwork\test.txt" -Destination "test_copy.txt"
+Rename-Item -Path "C:\Labwork\test.txt" -NewName "Renamed_file.txt"
+Move-Item -Path "renamed_file.txt" -Destination "C:\Labwork\Project01\"
+Remove-Item -Path "C:\Labwork\test.txt"
+#9
+Get-ChildItem
+Get-ChildItem "*.txt"
+GetContent -Path "WindowsCodecsRaw.txt"
+#10 
+Смотреть скрин
+#11
+New-Item -Path "HKCU:\Software\MyLabkey" -Force
+New-ItemProperty -Path "HKCU:\Software\MyLabkey" -Name "My_String" -Value "Hello world" -PropertyType String
+New-ItemProperty -Path "HKCU:\Software\MyLabkey" -Name "My_Number" -Value 123 -PropertyType DWord
+Get-ItemProperty -Path "HKCU:\Software\MyLabkey"
+#12
+Set-ItemProperty -Path HKCU:\Software\MyLabkey -Name "My_String" -Value "New Value"
+Remove-ItemProperty -Path "HKCU:\Software\MyLabkey" -Name "My_Number"
+Remove-Item -Path "HKCU:\Software\MyLabkey" -Recurse
+#13 скрин
+#14 skrin
+#15
+secedit /export /cfg "$env:TEMP\p.inf" /areas SECURITYPOLICY | Out-Null; (Select-String "MinimumPasswordLength" "$env:TEMP\p.inf" -SimpleMatch).Line.Split('=')[1].Trim(); Remove-Item "$env:TEMP\p.inf"
+#16
+$basePath = "C:\LabWork\Project01\Logs"
+$logFile = "C:\LabWork\execution_log.txt"
+function Write-Log
+{
+param([string]$Message)
+$timeStamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+"$timeStamp : $Message" | Out-File -FilePath $logFile -Append
+}
+Write-Log "Начало создания структуры каталогов по пути: $basePath"
+New-Item -Path $basePath -ItemType Directory -Force | Out-Null
+if (Test-Path -Path $basePath)
+{
+Write-Log "SUCCESS: Каталог $basePath существует и готов к работе."
+Write-Host "Структура успешно создана и проверена." -ForegroundColor Green
+} else
+{
+Write-Log "Error: Не удалось создать или найти каталог $basePath."
+Write-Host "Произошла ошибка при создании каталогов." -ForegroundColor Red
+}
+#17
+param([string]$ProcessName = $(Read-Host "Введите имя процесса (например, notepad)"))
+$process = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue
+if ($process)
+{
+Write-Host " Информация о процессе '$ProcessName'" -ForegroundColor Cyan
+$process | Select-Object Name, Id, CPU, WorkingSet, StartTime | Format-List
+$count = ($process).Count
+if ($null -eq $count) { $count = 1 }
+Write-Host "Найдено активных экземпляров: $count" -ForegroundColor Green
+}
+else
+{
+Write-Host "ERROR: Процесс с именем '$ProcessName' не запущен в системе." -ForegroundColor Red
+}
+#18
+$userName = "New_User"
+$groupName = "Пользователи"
+$description = "This is new User"
+try
+{
+Write-Host "Создание пользователя $userName..." -ForegroundColor Cyan
+New-LocalUser -Name $userName -Description $description -NoPassword -ErrorAction Stop
+Write-Host "Добавление $userName в группу '$groupName'..." -ForegroundColor Cyan
+Add-LocalGroupMember -Group $groupName -Member $userName -ErrorAction Stop
+$userCheck = Get-LocalUser -Name $userName -ErrorAction SilentlyContinue
+$groupCheck = Get-LocalGroupMember -Group $groupName | Where-Object { $_.Name -like "*$userName*" }
+if ($userCheck -and $groupCheck)
+{
+Write-Host "SUCCESS: Пользователь создан и добавлен в группу." -ForegroundColor Green
+}
+}
+catch
+{
+Write-Host "ERROR: Не удалось выполнить операцию." -ForegroundColor Red
+Write-Host "DETAILS: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+#19
+$registryPath = "HKCU:\Software\MyLabScriptKey"
+$backupPath = "C:\LabWork\registry_backup.reg"
+if (-not (Test-Path "C:\LabWork")) { New-Item -Path "C:\LabWork" -ItemType Directory -Force }
+try
+{
+Write-Host "Создание раздела: $registryPath" -ForegroundColor Cyan
+if (-not (Test-Path $registryPath))
+{
+New-Item -Path $registryPath -Force | Out-Null
+}
+Write-Host "Добавление параметров..." -ForegroundColor Cyan
+New-ItemProperty -Path $registryPath -Name "AppName" -Value "LabManager" -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $registryPath -Name "Version" -Value 1 -PropertyType DWord -Force | Out-Null
+Write-Host "Выполнение резервного копирования в $backupPath" -ForegroundColor Cyan
+reg export "HKCU\Software\MyLabScriptKey" $backupPath /y
+Write-Host "SUCCESS: Все операции выполнены успешно." -ForegroundColor Green
+}
+catch
+{
+Write-Host "ERROR: Произошла ошибка: $($_.Exception.Message)" -ForegroundColor Red
+}
+#20 скрин
